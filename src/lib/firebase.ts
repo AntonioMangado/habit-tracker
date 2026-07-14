@@ -60,6 +60,7 @@ function mapHabit(d: QueryDocumentSnapshot<DocumentData>): Habit {
     description: data.description,
     color: data.color,
     frequency: data.frequency,
+    hoursPerDay: data.hoursPerDay,
     createdAt: toISO(data.createdAt),
   }
 }

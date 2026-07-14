@@ -144,7 +144,7 @@ describe('useHabitStore', () => {
     if (!authCallback) throw new Error('authCallback not set')
     authCallback({ uid: 'u1' })
 
-    const newHabit = { name: 'Reading', description: 'Read daily', color: '#ff0000', frequency: 'daily' as const }
+    const newHabit = { name: 'Reading', description: 'Read daily', color: '#ff0000', frequency: 3, hoursPerDay: 1 }
     await store.getState().addHabit(newHabit)
 
     expect(vi.mocked(fb.createHabit)).toHaveBeenCalledWith('u1', newHabit)
@@ -214,7 +214,7 @@ describe('useHabitStore', () => {
 
     store.setState({ user: null }, false)
 
-    await store.getState().addHabit({ name: 'Test', description: '', color: '#fff', frequency: 'daily' })
+    await store.getState().addHabit({ name: 'Test', description: '', color: '#fff', frequency: 3, hoursPerDay: 1 })
     expect(vi.mocked(fb.createHabit)).not.toHaveBeenCalled()
 
     await store.getState().updateHabit('h1', { name: 'New' })

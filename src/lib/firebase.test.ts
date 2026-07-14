@@ -244,7 +244,8 @@ describe('Snapshot mappers', () => {
             name: 'Reading',
             description: 'Read daily',
             color: '#ff0000',
-            frequency: 'daily',
+            frequency: 3,
+            hoursPerDay: 1.5,
             createdAt: '2024-01-01T00:00:00.000Z',
           }),
         },
@@ -267,7 +268,8 @@ describe('Snapshot mappers', () => {
         name: 'Reading',
         description: 'Read daily',
         color: '#ff0000',
-        frequency: 'daily',
+        frequency: 3,
+        hoursPerDay: 1.5,
         createdAt: '2024-01-01T00:00:00.000Z',
       },
     ])
@@ -295,7 +297,8 @@ describe('Snapshot mappers', () => {
             name: 'Reading',
             description: 'Read daily',
             color: '#ff0000',
-            frequency: 'daily',
+            frequency: 3,
+            hoursPerDay: 1.5,
             createdAt: {
               toDate: () => new Date('2024-01-01'),
             },
@@ -411,7 +414,8 @@ describe('Firestore writes', () => {
       name: 'Reading',
       description: 'Read daily',
       color: '#ff0000',
-      frequency: 'daily',
+      frequency: 3,
+      hoursPerDay: 1.5,
     })
 
     expect(mockAddDoc).toHaveBeenCalled()

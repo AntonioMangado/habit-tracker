@@ -49,11 +49,34 @@ Tasks are processed in order. A task is eligible when all its **Requisites** are
 
 ---
 
-## T003 · Habit list view
+## T003 · Add habit modal
+
+- **Status**: `done`
+- **Priority**: high
+- **Requisites**: T002
+- **Description**: This app exists to visualize progress toward the "10,000 hours to mastery" idea (Outliers) for habits like practicing drums — so each habit needs to capture not just *what* and *how often*, but *how much time per session*, so hours-invested can be computed later. This task registers that data; visualizing accumulated hours comes in a later task.
+
+  Add an "Add habit" button on the home screen that opens a modal with: name (text, required), color picker (preset swatches), frequency per week (number, 1–7), and hours per day (number, > 0, decimals allowed e.g. 1.5). Submitting creates the habit; this task does not touch editing or the list/visualization view.
+
+  This changes the `Habit` data shape from T002: `frequency: 'daily' | 'weekly'` becomes `frequency: number` (times per week, 1–7), and a new `hoursPerDay: number` field is added. Update `src/types.ts`, `src/lib/firebase.ts` (Firestore mapping), `src/store` actions, and the existing T002 tests in `useHabitStore.test.ts` / `firebase.test.ts` that construct habits with the old `'daily'`/`'weekly'` shape. No `firestore.rules` change needed — rules are field-agnostic (`allow read, write` scoped by `uid`, not by document shape).
+- **Acceptance Criteria**:
+  - [x] `Habit.frequency` is `number` (1–7, times per week); `Habit.hoursPerDay: number` added to `src/types.ts` and Firestore mapping in `src/lib/firebase.ts`
+  - [x] "Add habit" button on the home screen opens the modal
+  - [x] Form fields: name, color picker (preset swatches), frequency per week, hours per day
+  - [x] Validation: name required (non-empty); frequency is an integer 1–7; hours per day is a number > 0 — submit is blocked with inline errors until valid
+  - [x] Submitting calls `addHabit` with the validated data and closes the modal
+  - [x] Escape key and backdrop click close the modal without saving
+  - [x] Component tests cover validation (each invalid case), successful add, and modal dismissal (escape/backdrop)
+  - [x] Existing T002 store/Firebase tests updated to match the new `frequency`/`hoursPerDay` shape and still pass
+- **Notes**: No edit flow yet (moved to a later task) — this task is add-only. No list/visualization UI — that's T004.
+
+---
+
+## T004 · Habit list view
 
 - **Status**: `pending`
 - **Priority**: high
-- **Requisites**: T002
+- **Requisites**: T003
 - **Description**: Build the main screen that lists all habits. Each row shows the habit name, color indicator, and today's check-in toggle.
 - **Acceptance Criteria**:
   - [ ] Empty state message when no habits exist
@@ -61,24 +84,7 @@ Tasks are processed in order. A task is eligible when all its **Requisites** are
   - [ ] Clicking the toggle calls `toggleEntry` for today's date
   - [ ] Completed habits are visually distinct (strikethrough or checkmark)
   - [ ] Component tests cover empty state, list render, and toggle interaction
-- **Notes**: No routing yet — this is the only screen for now.
-
----
-
-## T004 · Add / Edit habit modal
-
-- **Status**: `pending`
-- **Priority**: high
-- **Requisites**: T003
-- **Description**: A modal form for creating and editing habits. Fields: name (required), description (optional), color picker (preset swatches), frequency.
-- **Acceptance Criteria**:
-  - [ ] "Add habit" button opens modal
-  - [ ] Form validates: name must not be empty
-  - [ ] Submitting calls `addHabit` and closes modal
-  - [ ] Clicking a habit's edit icon pre-fills the form and calls `updateHabit` on submit
-  - [ ] Escape key and backdrop click close the modal without saving
-  - [ ] Component tests cover validation, add, and edit flows
-- **Notes**: —
+- **Notes**: No routing yet — this is the only screen for now. The "Add habit" button/modal from T003 lives on this screen.
 
 ---
 

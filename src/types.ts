@@ -1,11 +1,10 @@
-export type Frequency = 'daily' | 'weekly'
-
 export interface Habit {
   id: string
   name: string
   description: string
   color: string
-  frequency: Frequency
+  frequency: number
+  hoursPerDay: number
   createdAt: string
 }
 
