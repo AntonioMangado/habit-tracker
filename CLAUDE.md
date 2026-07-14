@@ -8,7 +8,17 @@ React + Vite + TypeScript habit tracking web app.
 - **Bundler**: Vite
 - **Tests**: Vitest + React Testing Library (jsdom)
 - **State**: Zustand (added in T002)
+- **Backend**: Firebase — Firestore (data) + Firebase Auth (Google sign-in), added in T002
 - **Path alias**: `@/` → `src/`
+
+## Firebase conventions
+
+- Firebase app is initialized once in `src/lib/firebase.ts`, exporting `auth` and `db`. No component or store file calls the `firebase/*` SDKs directly — everything goes through this module or the Zustand store.
+- Config comes from Vite env vars (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`), read from `.env.local` (gitignored). Never hardcode Firebase config values in source.
+- Firestore layout is per-user: `users/{uid}/habits/{habitId}` and `users/{uid}/entries/{entryId}`. Every read/write is scoped to the signed-in user's `uid`.
+- Firestore offline persistence is enabled (`persistentLocalCache`/IndexedDB) so the app keeps working offline and syncs when back online.
+- Security rules live in `firestore.rules` at the repo root and must restrict all access to `request.auth.uid == uid`. Any task that changes the Firestore data shape must update `firestore.rules` in the same change.
+- Firebase SDK calls must be mockable in tests (wrap them behind the store/hooks) — no test should hit a real Firebase project.
 
 ## Scripts
 
@@ -37,6 +47,7 @@ Spawn an Agent with `model: "opus"` and `subagent_type: "claude"`.
 The agent must:
 
 - Read the **entire codebase** (all files under `src/`, plus `TASKS.md`, `package.json`, `vite.config.ts`)
+- Read the **Firebase conventions** section of this file
 - Read the task spec (description + acceptance criteria)
 - Produce a **comprehensive implementation plan** covering:
   - Files to create or modify (with paths)
@@ -44,6 +55,14 @@ The agent must:
   - Test cases to write first (TDD — one test case per acceptance criterion)
   - Implementation steps in order
   - Edge cases to handle
+
+If the task touches auth, Firestore data, or security rules, the plan must additionally cover:
+
+- Which Firestore collections/documents are read or written, under the `users/{uid}/...` layout
+- Any changes needed to `firestore.rules`, and how those rules will be reasoned about (not just "restrict to owner" — call out the exact match/allow statements)
+- How Firebase Auth/Firestore calls will be mocked in unit tests (the plan must not rely on hitting a live Firebase project during `npm test`)
+- Whether Firestore's offline cache affects the acceptance criteria (e.g. optimistic UI updates before a write round-trips)
+- Any new environment variables required, and a note that they must be documented (not hardcoded)
 
 The plan is returned as the agent's response and passed directly to Step 3 (not saved to disk).
 

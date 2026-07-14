@@ -28,19 +28,24 @@ Tasks are processed in order. A task is eligible when all its **Requisites** are
 
 ---
 
-## T002 · Data models and persistence layer
+## T002 · Firebase auth and Firestore data layer
 
 - **Status**: `pending`
 - **Priority**: high
 - **Requisites**: T001
-- **Description**: Define all TypeScript types and a Zustand store that persists to localStorage. This is the single source of truth for the whole app.
+- **Description**: Set up Firebase (Auth + Firestore), define all TypeScript types, and a Zustand store that syncs in real time with Firestore, scoped to the signed-in user. This is the single source of truth for the whole app.
 - **Acceptance Criteria**:
+  - [ ] Firebase app initialized in `src/lib/firebase.ts`, reading config from `VITE_FIREBASE_*` env vars, exporting `auth` and `db`
+  - [ ] Google sign-in flow: `signInWithGoogle`, `signOut`, and an auth-state listener (exposed via the store or a `useAuth` hook)
   - [ ] `Habit` type: `id`, `name`, `description`, `color`, `frequency` (`daily` | `weekly`), `createdAt`
   - [ ] `HabitEntry` type: `id`, `habitId`, `date` (ISO `YYYY-MM-DD`), `completedAt`
-  - [ ] Store actions: `addHabit`, `updateHabit`, `deleteHabit`, `toggleEntry(habitId, date)`
-  - [ ] Store rehydrates from localStorage on load
-  - [ ] Unit tests cover every store action and rehydration
-- **Notes**: Use Zustand + zustand/middleware `persist`. Install as a dependency.
+  - [ ] Firestore layout: `users/{uid}/habits/{habitId}` and `users/{uid}/entries/{entryId}`
+  - [ ] Store actions `addHabit`, `updateHabit`, `deleteHabit`, `toggleEntry(habitId, date)` write to Firestore
+  - [ ] Store subscribes to Firestore `onSnapshot` listeners for the signed-in user's habits/entries and stays in sync in real time
+  - [ ] Firestore offline persistence enabled so the app works offline and syncs on reconnect
+  - [ ] `firestore.rules` restricts all reads/writes to `request.auth.uid == uid`
+  - [ ] Unit tests cover store actions and auth state transitions with the Firebase SDK mocked (no test hits a live project)
+- **Notes**: Install `firebase` as a dependency. See the "Firebase conventions" section in `CLAUDE.md`. Requires a Firebase project already created and `.env.local` populated before this task can be implemented end-to-end — see the manual Firebase console setup steps provided separately.
 
 ---
 
